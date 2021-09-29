@@ -15,6 +15,7 @@ import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.MutableLiveData
 import com.felhr.usbserial.UsbSerialDevice
 import com.felhr.usbserial.UsbSerialInterface.*
+import com.kunminx.architecture.ui.callback.UnPeekLiveData
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -26,7 +27,7 @@ class QRService: LifecycleService() {
     private var connection: UsbDeviceConnection? = null
     private var serialPort: UsbSerialDevice? = null
     private var scope: CoroutineScope? = null
-    private var mHandler: MutableLiveData<String>? = null
+    private var mHandler: UnPeekLiveData<String>? = null
     private var serialPortConnected = false
 
     private val usbReceiver = object : BroadcastReceiver() {
@@ -114,7 +115,7 @@ class QRService: LifecycleService() {
         serialPort?.write(HexUtil.decodeHex(STOP_READ))
     }
 
-    fun setHandler(handler: MutableLiveData<String>) {
+    fun setHandler(handler: UnPeekLiveData<String>) {
         mHandler = handler
     }
 
