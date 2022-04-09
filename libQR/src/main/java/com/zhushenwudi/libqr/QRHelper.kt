@@ -175,11 +175,21 @@ class QRHelper(private val context: Context, private val callback: (code: String
     }
 
     fun release() {
-        context.unregisterReceiver(usbReceiver)
+        serialPort?.close()
+        serialPort = null
         if (scope?.isActive == true) {
             scope?.cancel()
         }
         scope = null
+        try {
+            context.unregisterReceiver(usbReceiver)
+        } catch (e: Exception) {
+        }
+        isConnected = false
+    }
+
+    fun isRunning(): Boolean {
+        return isConnected
     }
 
     companion object {
