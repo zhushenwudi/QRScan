@@ -1,5 +1,6 @@
 package com.zhushenwudi.libqr
 
+import android.app.Activity
 import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -13,6 +14,7 @@ import com.felhr.usbserial.UsbSerialDevice
 import com.felhr.usbserial.UsbSerialInterface
 import kotlinx.coroutines.*
 import java.io.UnsupportedEncodingException
+import java.util.concurrent.atomic.AtomicBoolean
 
 class ScanGunHelper(
     private val context: Context,
@@ -24,7 +26,7 @@ class ScanGunHelper(
     private var serialPort: UsbSerialDevice? = null
     private var scope: CoroutineScope? = null
     private var isConnected = false
-    private var canHandle = false
+    private var canHandle = AtomicBoolean(false)
 
     private val usbReceiver = object : BroadcastReceiver() {
         override fun onReceive(arg0: Context, mIntent: Intent) {
@@ -36,7 +38,7 @@ class ScanGunHelper(
                         context.sendBroadcast(intent)
                         connection = usbManager.openDevice(device)
                         scope = CoroutineScope(Dispatchers.IO)
-                        scope?.launch {
+                        scope?.launch p@{
                             serialPort = UsbSerialDevice.createUsbSerialDevice(device, connection)
                             serialPort?.run {
                                 if (open()) {
@@ -50,8 +52,8 @@ class ScanGunHelper(
                                         try {
                                             val str = String(it, Charsets.UTF_8).trim()
                                             if (str.isNotEmpty()) {
-                                                if (canHandle) {
-                                                    canHandle = false
+                                                if (canHandle.get()) {
+                                                    canHandle.set(false)
                                                     callback(str)
                                                 }
                                             }
@@ -155,7 +157,7 @@ class ScanGunHelper(
      */
     suspend fun read() {
         checkConnected()
-        canHandle = true
+        canHandle.set(true)
     }
 
     private suspend fun checkConnected() {
