@@ -25,8 +25,7 @@ class ScanGunHelper(
     private var serialPort: UsbSerialDevice? = null
     private var scope: CoroutineScope? = null
     private var isConnected = false
-    private var canHandle = AtomicBoolean(false)
-    private var mLastClick: Long = 0
+    private val canHandle = AtomicBoolean(false)
 
     private val usbReceiver = object : BroadcastReceiver() {
         override fun onReceive(arg0: Context, mIntent: Intent) {
@@ -49,18 +48,16 @@ class ScanGunHelper(
                                     setParity(UsbSerialInterface.PARITY_NONE)
                                     setFlowControl(UsbSerialInterface.FLOW_CONTROL_OFF)
                                     read {
-                                        if (funcThrottle()) {
-                                            try {
-                                                val str = String(it, Charsets.UTF_8).trim()
-                                                if (str.isNotEmpty()) {
-                                                    if (canHandle.get()) {
-                                                        canHandle.set(false)
-                                                        callback(str)
-                                                    }
+                                        try {
+                                            val str = String(it, Charsets.UTF_8).trim()
+                                            if (str.isNotEmpty()) {
+                                                if (canHandle.get()) {
+                                                    canHandle.set(false)
+                                                    callback(str)
                                                 }
-                                            } catch (e: UnsupportedEncodingException) {
-                                                e.printStackTrace()
                                             }
+                                        } catch (e: UnsupportedEncodingException) {
+                                            e.printStackTrace()
                                         }
                                     }
                                 }
@@ -157,7 +154,7 @@ class ScanGunHelper(
     /**
      * 扫描一次
      */
-    suspend fun read() {
+    suspend fun readOnce() {
         checkConnected()
         canHandle.set(true)
     }
@@ -186,14 +183,6 @@ class ScanGunHelper(
 
     fun isRunning(): Boolean {
         return isConnected
-    }
-
-    fun funcThrottle(milliSeconds: Long = 200): Boolean {
-        if (System.currentTimeMillis() - mLastClick <= milliSeconds) {
-            return true
-        }
-        mLastClick = System.currentTimeMillis()
-        return false
     }
 
     companion object {
