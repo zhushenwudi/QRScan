@@ -159,6 +159,10 @@ class ScanGunHelper(
         canHandle.set(true)
     }
 
+    fun stop() {
+        canHandle.set(false)
+    }
+
     private suspend fun checkConnected() {
         if (!isConnected) {
             init()
