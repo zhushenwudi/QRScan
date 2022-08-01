@@ -95,6 +95,9 @@ class QRHelper(private val context: Context, private val callback: (code: String
                 device = value
                 val deviceVID = device?.vendorId
                 val devicePID = device?.productId
+                if (deviceVID == null || devicePID == null) {
+                    continue
+                }
                 Log.d("aaa", "deviceVID: $deviceVID - devicePID: $devicePID")
                 if (deviceVID == 0x27DD && devicePID == 0x0002 || deviceVID == 0x0103 && devicePID == 0x6061 || deviceVID == 0x26F1 && devicePID == 0x5650) {
                     requestUserPermission()

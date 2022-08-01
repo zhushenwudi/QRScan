@@ -102,6 +102,9 @@ class ScanGunHelper(
                 device = value
                 val deviceVID = device?.vendorId
                 val devicePID = device?.productId
+                if (deviceVID == null || devicePID == null) {
+                    continue
+                }
                 Log.d("aaa", "deviceVID: $deviceVID - devicePID: $devicePID")
                 if (deviceVID == 0x1EAB && devicePID == 0x1406) {
                     requestUserPermission()
