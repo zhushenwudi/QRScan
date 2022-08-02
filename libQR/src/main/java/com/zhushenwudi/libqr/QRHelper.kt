@@ -32,6 +32,9 @@ class QRHelper(private val context: Context, private val callback: (code: String
                         val intent = Intent(ACTION_USB_PERMISSION_GRANTED)
                         context.sendBroadcast(intent)
                         connection = usbManager.openDevice(device)
+                        if (connection == null) {
+                            return@let
+                        }
                         scope = CoroutineScope(Dispatchers.IO)
                         scope?.launch {
                             serialPort = UsbSerialDevice.createUsbSerialDevice(device, connection)
